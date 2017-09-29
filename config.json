@@ -1,0 +1,11 @@
+{
+  "LOG_TYPE": "console",
+  "LOG_DIR": "./logs/",
+
+  "TMP_DIR": "./tmp",
+
+  "OUTPUT_DIR": "./output",
+
+  "CDN_GIT_URL": "git@github.com:serghov/rodin-cdn.git",
+  "CDN_GIT_NAME": "rodin-cdn"
+}
