@@ -121,20 +121,21 @@ async function handleLibrary(jsonPath) {
                 await exec(versionConfig.commands[i], {cwd: checkoutTmpDir});
         }
 
+        const pathToRemove = path.join(packageOutputDir, versionConfig.versionCode);
+
+        if (fs.existsSync(pathToRemove)) {
+            logger.info(`Removing old ${pathToRemove}`);
+            await fs.remove(pathToRemove);
+            logger.info('Success');
+        }
 
         for (let i in versionConfig.output) {
             const outputDir = path.join(packageOutputDir, versionConfig.versionCode, i);
 
-            const pathToRemove = path.join(packageOutputDir, versionConfig.versionCode);
 
-            if (fs.existsSync(pathToRemove)) {
-                logger.info(`Removing old ${pathToRemove}`);
-                await fs.remove(pathToRemove);
-                logger.info('Success');
-            }
-
-            logger.info(`Copying ${path.join(checkoutTmpDir, versionConfig.output[i].from)} to ${outputDir}`);
-            await fs.copy(path.join(checkoutTmpDir, versionConfig.output[i].from), outputDir);
+            const destPath = path.join(checkoutTmpDir, versionConfig.output[i].from);
+            logger.info(`Copying ${destPath} to ${outputDir}`);
+            await fs.copy(destPath, outputDir);
             logger.info('Success');
 
             // await createRodinPackage(versionConfig.versionCode, buildConfig, outputDir, rodin_package, versionConfig.output[i].main);
