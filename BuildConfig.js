@@ -69,9 +69,9 @@ class BuildConfig {
                 curOutput = version.output;
             }
 
-            version.commands = curCommands;
-            version.source = curSource;
-            version.output = curOutput;
+            version.commands = Object.assign({}, curCommands);
+            version.source = Object.assign({}, curSource);
+            version.output = Object.assign({}, curOutput);
         }
 
 
