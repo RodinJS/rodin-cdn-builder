@@ -58,11 +58,11 @@ class BuildConfig {
 
         for (let version of this.versions){
             if (version.commands) {
-                curCommands = Object.assign(curCommands, version.commands);
+                curCommands = version.commands;
             }
 
             if (version.source) {
-                curSource = Object.assign(curSource, version.source);
+                curSource = version.source;
             }
 
             if (version.output) {
