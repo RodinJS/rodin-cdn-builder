@@ -26,8 +26,8 @@ class Logger extends winston.Logger {
             transports: transports
         });
 
-        this.info(`Logs started at ${Date.now()}`);
+        this.info(`Logs started at ${new Date()}`);
     };
-};
+}
 
 module.exports = new Logger();
