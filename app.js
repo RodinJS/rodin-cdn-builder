@@ -87,7 +87,7 @@ async function getGit(url, folder, recursive = false) {
 async function handleLibrary(jsonPath) {
     logger.info(`Start handle library ${jsonPath}`);
 
-    const buildConfig = new BuildConfig(require(`./${jsonPath}`));
+    const buildConfig = new BuildConfig(require(`${jsonPath}`));
 
     const packageOutputDir = path.join(config.OUTPUT_DIR, buildConfig.buildConfig.name);
     await fs.ensureDir(packageOutputDir);
@@ -113,7 +113,6 @@ async function handleLibrary(jsonPath) {
         await fs.copy(path.join(config.TMP_DIR, curGit.directory), checkoutTmpDir);
 
         for (let i in versionConfig.commands) {
-            console.log(i, versionConfig.commands[i], curGit.directory);
             if (versionConfig.commands[i]) {
                 await exec(versionConfig.commands[i], {cwd: checkoutTmpDir});
             }
