@@ -2,7 +2,7 @@
   "LOG_TYPE": "console",
   "LOG_DIR": "./logs/",
 
-  "TMP_DIR": "/Users/rodin/Documents/rodin/rodin-cdn-builder/tmp",
+  "TMP_DIR": "./tmp",
 
   "OUTPUT_DIR": "./output",
 
