@@ -166,7 +166,7 @@ async function doStuff() {
     const cdn_files = (await fs.readdir(path.join(config.TMP_DIR, config.CDN_GIT_NAME))).filter(x => x.endsWith('.json'));
     for (let lib of cdn_files) {
         // // todo: dont forget to remove next line
-        if (lib.indexOf('main') === -1) continue; // todo: remove this
+        // if (lib.indexOf('main') === -1) continue; // todo: remove this
 
         await handleLibrary(path.join(config.TMP_DIR, config.CDN_GIT_NAME, lib));
     }
