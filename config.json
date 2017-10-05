@@ -15,5 +15,9 @@
   "META_FILE_NAME": "./meta.json",
 
   "CDN_GIT_URL": "git@github.com:serghov/rodin-cdn.git",
-  "CDN_GIT_NAME": "rodin-cdn"
+  "CDN_GIT_NAME": "rodin-cdn",
+
+  "ALIAS_VERSIONS": {
+    "LATEST": "latest"
+  }
 }

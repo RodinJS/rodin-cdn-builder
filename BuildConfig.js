@@ -1,4 +1,5 @@
 const semver = require('semver');
+const deepMerge = require('merge-deep');
 
 
 class BuildConfig {
@@ -19,7 +20,8 @@ class BuildConfig {
             versions = versions.map(i => ({
                 source: {
                     type: 'git',
-                    commit:  i[0]
+                    commit:  i[0],
+                    url: this.buildConfig.source.url
                 },
                 versionName: i[1],
                 versionCode: this.buildConfig.semver ? semver.clean(i[1]) : i[1]
@@ -30,7 +32,7 @@ class BuildConfig {
                 res[versions[i].versionCode] = versions[i];
             }
 
-            this.buildConfig.versions = Object.assign(res, this.buildConfig.versions);
+            this.buildConfig.versions = deepMerge(res, this.buildConfig.versions);
             versions = Object.entries(this.buildConfig.versions).map(i => {
                 return Object.assign({
                     versionName: i[0],
@@ -73,10 +75,8 @@ class BuildConfig {
             version.source = Object.assign({}, curSource);
             version.output = Object.assign({}, curOutput);
         }
-
-
+        console.log(JSON.stringify(this.versions, null, 4));
     }
-
 }
 
 BuildConfig.git = 'git';

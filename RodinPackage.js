@@ -19,8 +19,8 @@ class RodinPackage {
             sources: []
         };
 
-        for (let i in this.buildConfig.output) {
-            const cur = this.buildConfig.output[i];
+        for (let i in this.versionConfig.output) {
+            const cur = this.versionConfig.output[i];
             this.pkg.sources.push({
                 env: cur.env,
                 main: path.join(i, cur.main),

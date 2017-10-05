@@ -17,10 +17,6 @@ async function cleanDirs() {
     logger.info(`Removing tmp dir : ${config.TMP_DIR}`);
     await fs.remove(config.TMP_DIR);
     logger.info(`Success`);
-
-    // logger.info(`Removing output dir : ${config.OUTPUT_DIR}`);
-    // await fs.remove(config.OUTPUT_DIR);
-    // logger.info(`Success`);
 }
 
 async function copyOldOutput() {
@@ -28,8 +24,8 @@ async function copyOldOutput() {
     await fs.copy(config.OUTPUT_DIR, tmpOutputDir);
     logger.info(`Success`);
 
-    // native_fs.symlinkSync(tmpOutputDir, config.SYMLINK_PATH);
     await exec(`ln -sfn ${tmpOutputDir} ${config.SYMLINK_PATH}`);
+    await fs.remove(path.join(config.TMP_DIR, 'copy.lock'));
 }
 
 async function restoreSymlink() {
@@ -78,11 +74,11 @@ async function createBackup() {
     logger.info('Success');
 }
 
-async function getGit(url, folder) {
+async function getGit(url, folder, recursive = false) {
     let curGit = clonedGits[url];
     if (!curGit) {
         curGit = new Git(url);
-        await curGit.clone(folder);
+        await curGit.clone(folder, recursive);
         clonedGits[url] = curGit;
     }
     return curGit;
@@ -101,12 +97,13 @@ async function handleLibrary(jsonPath) {
 
     await generateMeta(buildConfig.versions, buildConfig.buildConfig, packageOutputDir);
 
-    for (let versionConfig of buildConfig.versions) {
+    for (let i = 0; i < buildConfig.versions.length; i++) {
+        const versionConfig = buildConfig.versions[i];
 
-        console.log(versionConfig.versionCode, versionConfig.commands);
+        logger.info(`Processing version ${versionConfig.versionCode} ...`);
 
         const url = versionConfig.source.url;
-        const curGit = await getGit(url, buildConfig.buildConfig.name);
+        const curGit = await getGit(url, buildConfig.buildConfig.name, buildConfig.buildConfig.recursive);
 
         await curGit.clean();
         await curGit.checkout(versionConfig.source.commit || versionConfig.versionName);
@@ -117,8 +114,9 @@ async function handleLibrary(jsonPath) {
 
         for (let i in versionConfig.commands) {
             console.log(i, versionConfig.commands[i], curGit.directory);
-            if (versionConfig.commands[i])
+            if (versionConfig.commands[i]) {
                 await exec(versionConfig.commands[i], {cwd: checkoutTmpDir});
+            }
         }
 
         const pathToRemove = path.join(packageOutputDir, versionConfig.versionCode);
@@ -132,19 +130,25 @@ async function handleLibrary(jsonPath) {
         for (let i in versionConfig.output) {
             const outputDir = path.join(packageOutputDir, versionConfig.versionCode, i);
 
-
             const destPath = path.join(checkoutTmpDir, versionConfig.output[i].from);
             logger.info(`Copying ${destPath} to ${outputDir}`);
             await fs.copy(destPath, outputDir);
             logger.info('Success');
+        }
 
-            // await createRodinPackage(versionConfig.versionCode, buildConfig, outputDir, rodin_package, versionConfig.output[i].main);
+        if (i === buildConfig.versions.length - 1) {
+            // const latestDir = path.join(packageOutputDir);
+            // const latestSymlink = path.join(packageOutputDir, );
+
+            // todo: check this logic
+            logger.info(`Creating symlink ${versionConfig.versionCode} to ${config.ALIAS_VERSIONS.LATEST}`);
+            await exec(`ln -sfn ${versionConfig.versionCode} ${config.ALIAS_VERSIONS.LATEST}`, {cwd: packageOutputDir});
+            logger.info('Success');
         }
 
         const rodinPackage = new RodinPackage(buildConfig.buildConfig, versionConfig, path.join(checkoutTmpDir, 'rodin_package.json'));
         await rodinPackage.init();
         await rodinPackage.write(path.join(packageOutputDir, versionConfig.versionCode));
-
 
         await fs.remove(checkoutTmpDir);
     }
@@ -161,13 +165,14 @@ async function doStuff() {
 
     const cdn_files = (await fs.readdir(path.join(config.TMP_DIR, config.CDN_GIT_NAME))).filter(x => x.endsWith('.json'));
     for (let lib of cdn_files) {
-        // todo: dont forget to remove next line
-        // if (lib.indexOf('open') === -1) continue; // todo: remove this
+        // // todo: dont forget to remove next line
+        if (lib.indexOf('main') === -1) continue; // todo: remove this
 
         await handleLibrary(path.join(config.TMP_DIR, config.CDN_GIT_NAME, lib));
     }
 
     await restoreSymlink();
+    await cleanDirs();
 }
 
 doStuff().catch(e => {
