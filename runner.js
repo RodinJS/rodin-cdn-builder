@@ -40,4 +40,3 @@ for(let signal of ['SIGINT', 'SIGTERM', 'SIGPIPE', 'SIGHUP', 'SIGBREAK']) {
         });
     })
 }
-

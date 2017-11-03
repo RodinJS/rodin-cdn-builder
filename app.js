@@ -87,7 +87,7 @@ async function getGit(url, folder, recursive = false) {
 async function handleLibrary(jsonPath) {
     logger.info(`Start handle library ${jsonPath}`);
 
-    const buildConfig = new BuildConfig(require(`${jsonPath}`));
+    const buildConfig = new BuildConfig(require(`./${jsonPath}`));
 
     const packageOutputDir = path.join(config.OUTPUT_DIR, buildConfig.buildConfig.name);
     await fs.ensureDir(packageOutputDir);
